@@ -6,7 +6,6 @@ import streamlit as st
 # https://stackoverflow.com/a/9997374
 # col1, col2, col3 = st.beta_col`umns(3)
 def ccw(A, B, C):
-    print(A, B, C)
     return (C[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (C[0] - A[0])
 
 
@@ -54,7 +53,6 @@ def get_closest_intersection(point, finish, sides):
         A, B, C, D = point, finish, s.T[0], s.T[1]
         intrs = is_intersection(A, B, C, D)
         if intrs:
-            # print(A, B, C, D)
             intersection = get_intersect(A, B, C, D)
             intersection_length = np.linalg.norm(intersection - point)
             if intersection_length < min_length:
@@ -74,7 +72,7 @@ def get_closest_intersection(point, finish, sides):
     return (next_intersection, lines)
 
 
-def plot_figure(s, f, o, path_points):
+def plot_figure(s, f, o, path_points=None):
     # s = np.array(field["start"])
     # f = np.array(field["finish"])
     # o = field["obstacles"]
@@ -82,7 +80,10 @@ def plot_figure(s, f, o, path_points):
     finish = go.Scatter(x=[f[0]], y=[f[1]], name="Finish")
     x, y = np.array([s, f]).T
     line = go.Scatter(x=x, y=y, name="Line")
-    path = go.Scatter(x=path_points.T[0], y=path_points.T[1], name="Path")
+    figures = [start, finish, line]
+    if path_points is not None:
+        path = go.Scatter(x=path_points.T[0], y=path_points.T[1], name="Path")
+        figures.append(path)
 
     coords1 = [np.array(obj).T for obj in o]
     obstacles = [
@@ -90,7 +91,7 @@ def plot_figure(s, f, o, path_points):
     ]
 
     fig = go.Figure(
-        obstacles + [start, finish, line, path],
+        obstacles + figures,
         layout=dict(
             width=800,
             height=800,
@@ -101,13 +102,19 @@ def plot_figure(s, f, o, path_points):
     return fig
 
 
-def get_closest_point(lines, pt):
+def get_closest_point(lines, finish, start):
     min_len = np.inf
     min_pt = None
-    for line in lines:
-        l = np.linalg.norm(pt - line)
-        st.text((line, pt, l))
+    for i, line in enumerate(lines):
+        if np.all(np.isclose(line, start)):
+            st.info("close!")
+            continue
+        l = np.linalg.norm(finish - line)
         if l < min_len:
             min_len = l
             min_pt = line
     return min_pt
+
+
+def equal(a, b, tol=1e-5):
+    return np.linalg.norm(a - b) < tol

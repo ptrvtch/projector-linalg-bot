@@ -12,6 +12,8 @@ from utils import (
 
 st.set_page_config(layout="wide")
 
+# start page setup
+
 options = [
     "robot-test-1.json",
     "robot-test-4.json",
@@ -32,42 +34,54 @@ sides = get_sides_pairs(o)
 
 intersection, line = get_closest_intersection(s, f, sides)
 
-st.text((intersection, line))
+# end page setup and preparations
 
-st.text(get_closest_point(line, f))
 
+# start algorithm
 
 
 path_points = []
+
+
+st.write(plot_figure(s, f, o))
+
 current_point = s
+log = st.markdown(f"starting from point {current_point}")
+
+path_points.append(current_point)
 while not np.array_equal(current_point, f):
-    st.text(current_point)
-    path_points.append(current_point)
 
     nearest_intersection, line_points = get_closest_intersection(
         current_point, f, sides
     )
     if nearest_intersection is None:
         current_point = f
-        st.text(current_point)
+        st.markdown(
+            f"\nNo obstacles between current and finish point, seting finish point as {current_point}"
+        )
         path_points.append(current_point)
         break
     else:
         current_point = nearest_intersection
-        st.text(current_point)
+        st.markdown(f"\nMoving to nearest intersection - {current_point}")
         path_points.append(current_point)
 
-        closest_obstacle_point = get_closest_point(line_points, f)
+        closest_obstacle_point = get_closest_point(line_points, f, s)
         current_point = closest_obstacle_point
+        st.markdown(
+            f"\nMoving to the obstacle edge nearest to finish - {current_point}"
+        )
+        path_points.append(current_point)
 
-st.write(path_points)
+
+st.dataframe(path_points)
 
 st.write(plot_figure(s, f, o, np.array(path_points)))
 
 # closest_intersection, side =
-get_closest_intersection(
-    current_point,
-    f,
-    sides,
-)
+# get_closest_intersection(
+#     current_point,
+#     f,
+#     sides,
+# )
 # print(closest_intersection, side)
