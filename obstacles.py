@@ -1,3 +1,4 @@
+from re import S
 import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
@@ -18,12 +19,31 @@ if file_name != "manual_input":
     f = open(file_name)
     field = json.load(f)
 
-start = field["start"]
-finish = field["finish"]
-obstacles = field["obstacles"]
+s = field["start"]
+f = field["finish"]
+o = field["obstacles"]
 
-sides = get_sides_pairs(obstacles)
+sides = get_sides_pairs(o)
 
-st.text(get_closest_intersection(start, finish, sides))
+st.text(get_closest_intersection(s, f, sides))
 
-st.write(plot_figure(start, finish, obstacles))
+st.write(plot_figure(s, f, o))
+
+
+path_points = []
+current_point = s
+while current_point != f:
+    path_points.append(current_point)
+
+    nearest_intersection, line_points = get_closest_intersection(
+        current_point, f, sides
+    )
+
+    break
+# closest_intersection, side =
+get_closest_intersection(
+    current_point,
+    f,
+    sides,
+)
+# print(closest_intersection, side)

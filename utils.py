@@ -47,7 +47,8 @@ def get_intersect(a1, a2, b1, b2):
 def get_closest_intersection(point, finish, sides):
     intersections = []
     min_length = np.inf
-    closest_intersection = None
+    lines = None
+    next_intersection = None
     for s in sides:
         A, B, C, D = point, finish, s.T[0], s.T[1]
         intrs = is_intersection(A, B, C, D)
@@ -57,7 +58,8 @@ def get_closest_intersection(point, finish, sides):
             intersection_length = np.linalg.norm(intersection - point)
             if intersection_length < min_length:
                 min_length = intersection_length
-                closest_intersection = (C, D)
+                lines = (C, D)
+                next_intersection = intersection
 
             intersections.append(
                 {
@@ -66,9 +68,9 @@ def get_closest_intersection(point, finish, sides):
                     "sides": s,
                 }
             )
-    if closest_intersection is None:
+    if next_intersection is None:
         return None
-    return {"min_length": min_length, "closest_intersection": closest_intersection}
+    return (next_intersection, lines)
 
 
 def plot_figure(s, f, o):
