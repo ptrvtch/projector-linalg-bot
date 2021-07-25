@@ -1,6 +1,7 @@
 import numpy as np
 from itertools import combinations
 import plotly.graph_objects as go
+import streamlit as st
 
 # https://stackoverflow.com/a/9997374
 # col1, col2, col3 = st.beta_col`umns(3)
@@ -69,11 +70,11 @@ def get_closest_intersection(point, finish, sides):
                 }
             )
     if next_intersection is None:
-        return None
+        return (None, None)
     return (next_intersection, lines)
 
 
-def plot_figure(s, f, o):
+def plot_figure(s, f, o, path_points):
     # s = np.array(field["start"])
     # f = np.array(field["finish"])
     # o = field["obstacles"]
@@ -81,6 +82,7 @@ def plot_figure(s, f, o):
     finish = go.Scatter(x=[f[0]], y=[f[1]], name="Finish")
     x, y = np.array([s, f]).T
     line = go.Scatter(x=x, y=y, name="Line")
+    path = go.Scatter(x=path_points.T[0], y=path_points.T[1], name="Path")
 
     coords1 = [np.array(obj).T for obj in o]
     obstacles = [
@@ -88,7 +90,7 @@ def plot_figure(s, f, o):
     ]
 
     fig = go.Figure(
-        [start, finish, line] + obstacles,
+        obstacles + [start, finish, line, path],
         layout=dict(
             width=800,
             height=800,
@@ -97,3 +99,15 @@ def plot_figure(s, f, o):
         ),
     )
     return fig
+
+
+def get_closest_point(lines, pt):
+    min_len = np.inf
+    min_pt = None
+    for line in lines:
+        l = np.linalg.norm(pt - line)
+        st.text((line, pt, l))
+        if l < min_len:
+            min_len = l
+            min_pt = line
+    return min_pt
