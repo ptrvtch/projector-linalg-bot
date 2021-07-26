@@ -4,6 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 import json
 from utils import (
+    check_polyline,
     get_closest_point,
     get_sides_pairs,
     get_closest_intersection,
@@ -62,45 +63,50 @@ path_points = []
 # col1.write(plot_figure(s, f, o))
 
 current_point = s
-log = st.info(f"starting from point {current_point}")
 
-path_points.append(current_point)
-iteration = 0
-while not np.array_equal(current_point, f):
-    iteration = iteration + 1
-    st.markdown(iteration)
-    if iteration == 10:
-        st.warning(f"{iteration} iterations, aborting")
-        break
+with st.beta_expander("Click here to see step-by-step details:"):
+    log = st.info(f"starting from point {current_point}")
 
-    st.markdown(f"Looking for nearest intersection of point {current_point} and {f}")
-    nearest_intersection, line_points = get_closest_intersection(
-        current_point, f, sides
-    )
-    if nearest_intersection is None:
-        current_point = f
-        st.info(
-            f"\nNo obstacles between current and finish point, seting finish point as {current_point}"
+    path_points.append(current_point)
+    iteration = 0
+    while not np.array_equal(current_point, f):
+        iteration = iteration + 1
+        st.markdown(iteration)
+        if iteration == 10:
+            st.warning(f"{iteration} iterations, aborting")
+            break
+
+        st.markdown(f"Looking for nearest intersection of point {current_point} and {f}")
+        nearest_intersection, line_points = get_closest_intersection(
+            current_point, f, sides
         )
-        path_points.append(current_point)
-        break
-    else:
-        previous_point = current_point
-        current_point = nearest_intersection
-        st.markdown(f"\nMoving to nearest intersection: {current_point}")
-
-        closest_obstacle_point = get_closest_point(line_points, f, s)
-        if equal(current_point, closest_obstacle_point):
-            st.info("current_point and closest_obstacle are equal!")
-            continue
-        a, b = get_closest_intersection(previous_point, closest_obstacle_point, sides)
-        if a is not None:
+        if nearest_intersection is None:
+            current_point = f
+            st.info(
+                f"\nNo obstacles between current and finish point, seting finish point as {current_point}"
+            )
             path_points.append(current_point)
-        current_point = closest_obstacle_point
-        st.markdown(f"\nMoving to the obstacle edge nearest to finish: {current_point}")
-        path_points.append(current_point)
+            break
+        else:
+            previous_point = current_point
+            current_point = nearest_intersection
+            st.markdown(f"\nMoving to nearest intersection: {current_point}")
+
+            closest_obstacle_point = get_closest_point(line_points, f, s)
+            if equal(current_point, closest_obstacle_point):
+                st.info("current_point and closest_obstacle are equal!")
+                continue
+            a, b = get_closest_intersection(previous_point, closest_obstacle_point, sides)
+            if a is not None:
+                path_points.append(current_point)
+            current_point = closest_obstacle_point
+            st.markdown(f"\nMoving to the obstacle edge nearest to finish: {current_point}")
+            path_points.append(current_point)
 
 
-st.dataframe(path_points)
+    st.dataframe(path_points)
+
+if check_polyline(path_points, np.array(o)):
+    st.info("No intersections found using function 'check_polilyne'")
 
 graph.write(plot_figure(s, f, o, np.array(path_points)))

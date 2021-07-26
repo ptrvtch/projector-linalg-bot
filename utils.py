@@ -3,10 +3,26 @@ from itertools import combinations
 import plotly.graph_objects as go
 import streamlit as st
 
-# https://stackoverflow.com/a/9997374
-# col1, col2, col3 = st.beta_col`umns(3)
-def ccw(A, B, C):
-    return (C[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (C[0] - A[0])
+
+def check_polyline(polyline, obstacles):
+    """this function returns True if the polyline does not intersect obstacles
+    Otherwise it returns False
+    You can use it to verify your algorithm
+    """
+    for obstacle in obstacles:
+        for i in range(len(obstacle)):
+            obstacle_segment = (obstacle[i - 1], obstacle[i])
+            for j in range(1, len(polyline)):
+                path_segment = (polyline[j - 1], polyline[j])
+                if is_intersection(
+                    obstacle_segment[0],
+                    obstacle_segment[1],
+                    path_segment[0],
+                    path_segment[1],
+                ):
+                    st.warning(f"segments intersect: {obstacle_segment}, {path_segment}")
+                    return False
+    return True
 
 
 def is_intersection(A, B, C, D):
@@ -18,8 +34,8 @@ def is_intersection(A, B, C, D):
     ##
     ## if lines intersect within the given segments, a and b must be strictly between 0 and 1
 
-    v1, v2 = A, B
-    u1, u2 = C, D
+    v1, v2 = np.array(A), np.array(B)
+    u1, u2 = np.array(C), np.array(D)
 
     M = np.array([v1 - v2, u2 - u1]).T
     if np.linalg.matrix_rank(M) < 2:
