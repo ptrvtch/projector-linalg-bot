@@ -63,14 +63,17 @@ while not np.array_equal(current_point, f):
         path_points.append(current_point)
         break
     else:
+        previous_point = current_point
         current_point = nearest_intersection
         st.markdown(f"\nMoving to nearest intersection: {current_point}")
-        path_points.append(current_point)
 
         closest_obstacle_point = get_closest_point(line_points, f, s)
         if equal(current_point, closest_obstacle_point):
             st.info("current_point and closest_obstacle are equal!")
             continue
+        a, b = get_closest_intersection(previous_point, closest_obstacle_point, sides)
+        if a is not None:
+            path_points.append(current_point)
         current_point = closest_obstacle_point
         st.markdown(f"\nMoving to the obstacle edge nearest to finish: {current_point}")
         path_points.append(current_point)
