@@ -15,6 +15,7 @@ st.set_page_config(layout="wide")
 
 # start page setup
 
+
 options = [
     "robot-test-1.json",
     "robot-test-4.json",
@@ -22,6 +23,9 @@ options = [
     "manual_input",
 ]
 file_name = st.selectbox("Select field", options=options)
+
+
+col1, col2 = st.beta_columns(2)
 
 if file_name != "manual_input":
     f = open(file_name)
@@ -33,11 +37,9 @@ o = field["obstacles"]
 
 sides = get_sides_pairs(o)
 
-
 path_points = []
 
-
-st.write(plot_figure(s, f, o))
+col1.write(plot_figure(s, f, o))
 
 current_point = s
 log = st.info(f"starting from point {current_point}")
@@ -81,4 +83,4 @@ while not np.array_equal(current_point, f):
 
 st.dataframe(path_points)
 
-st.write(plot_figure(s, f, o, np.array(path_points)))
+col2.write(plot_figure(s, f, o, np.array(path_points)))
