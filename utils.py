@@ -91,14 +91,11 @@ def get_closest_intersection(point, finish, sides):
 
 
 def plot_figure(s, f, o, path_points=None):
-    # s = np.array(field["start"])
-    # f = np.array(field["finish"])
-    # o = field["obstacles"]
     start = go.Scatter(x=[s[0]], y=[s[1]], name="Start")
     finish = go.Scatter(x=[f[0]], y=[f[1]], name="Finish")
     x, y = np.array([s, f]).T
-    line = go.Scatter(x=x, y=y, name="Line")
-    figures = [start, finish, line]
+    # line = go.Scatter(x=x, y=y, name="Line")
+    figures = [start, finish]
     if path_points is not None:
         path = go.Scatter(x=path_points.T[0], y=path_points.T[1], name="Path")
         figures.append(path)
