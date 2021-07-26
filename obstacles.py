@@ -44,7 +44,7 @@ example = """{
 }
 """
 
-file_name = st.sidebar.selectbox("Select field", options=options)
+file_name = st.sidebar.selectbox("Select field", options=options, index=3)
 
 
 if file_name != "manual_input":
