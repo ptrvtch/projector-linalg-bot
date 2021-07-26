@@ -20,7 +20,9 @@ def check_polyline(polyline, obstacles):
                     path_segment[0],
                     path_segment[1],
                 ):
-                    st.warning(f"segments intersect: {obstacle_segment}, {path_segment}")
+                    st.warning(
+                        f"segments intersect: {obstacle_segment}, {path_segment}"
+                    )
                     return False
     return True
 
@@ -106,15 +108,21 @@ def get_closest_intersection(point, finish, sides):
     return (next_intersection, lines)
 
 
-def plot_figure(s, f, o, path_points=None):
+def plot_figure(s, f, o, path_points=None, path_color=None):
     start = go.Scatter(x=[s[0]], y=[s[1]], name="Start")
     finish = go.Scatter(x=[f[0]], y=[f[1]], name="Finish")
+    if not path_color:
+        path_color = "orange"
     x, y = np.array([s, f]).T
     # line = go.Scatter(x=x, y=y, name="Line")
     figures = [start, finish]
     if path_points is not None:
         path = go.Scatter(
-            x=path_points.T[0], y=path_points.T[1], name="Path", marker_color="black"
+            x=path_points.T[0],
+            y=path_points.T[1],
+            name="Path",
+            marker_color=path_color,
+            line_width=3,
         )
         figures = [path] + figures
 

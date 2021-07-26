@@ -1,4 +1,5 @@
 from re import S
+import pandas as pd
 import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
@@ -15,11 +16,14 @@ from utils import (
 st.set_page_config(layout="wide")
 
 st.title("Path Finding Algorithm")
-st.info("""
+st.sidebar.info(
+    """
 Select the file example on the left, or select "Manual Input" and paste JSON to the window.
-""")
+"""
+)
 
 # start page setup
+path_color = st.color_picker("Path Trace color", value="#FF0000")
 graph = st.empty()
 
 options = [
@@ -60,6 +64,8 @@ sides = get_sides_pairs(o)
 
 path_points = []
 
+finished_successfully = False
+
 # col1.write(plot_figure(s, f, o))
 
 current_point = s
@@ -72,11 +78,13 @@ with st.beta_expander("Click here to see step-by-step details:"):
     while not np.array_equal(current_point, f):
         iteration = iteration + 1
         st.markdown(iteration)
-        if iteration == 10:
+        if iteration == 100:
             st.warning(f"{iteration} iterations, aborting")
             break
 
-        st.markdown(f"Looking for nearest intersection of point {current_point} and {f}")
+        st.markdown(
+            f"Looking for nearest intersection of point {current_point} and {f}"
+        )
         nearest_intersection, line_points = get_closest_intersection(
             current_point, f, sides
         )
@@ -86,6 +94,7 @@ with st.beta_expander("Click here to see step-by-step details:"):
                 f"\nNo obstacles between current and finish point, seting finish point as {current_point}"
             )
             path_points.append(current_point)
+            finished_successfully = True
             break
         else:
             previous_point = current_point
@@ -96,17 +105,46 @@ with st.beta_expander("Click here to see step-by-step details:"):
             if equal(current_point, closest_obstacle_point):
                 st.info("current_point and closest_obstacle are equal!")
                 continue
-            a, b = get_closest_intersection(previous_point, closest_obstacle_point, sides)
+            a, b = get_closest_intersection(
+                previous_point, closest_obstacle_point, sides
+            )
             if a is not None:
                 path_points.append(current_point)
             current_point = closest_obstacle_point
-            st.markdown(f"\nMoving to the obstacle edge nearest to finish: {current_point}")
+            st.markdown(
+                f"\nMoving to the obstacle edge nearest to finish: {current_point}"
+            )
             path_points.append(current_point)
-
-
-    st.dataframe(path_points)
+if not finished_successfully:
+    st.sidebar.warning(
+        f"Algorithm not finished successfully! stopped after {iteration} iterations"
+    )
+st.sidebar.text("Path point coordinates below:")
+st.sidebar.dataframe(path_points)
+st.sidebar.markdown(
+    json.dumps(pd.Series(path_points).to_json(orient="values"), indent=2)
+)
 
 if check_polyline(path_points, np.array(o)):
     st.info("No intersections found using function 'check_polilyne'")
 
-graph.write(plot_figure(s, f, o, np.array(path_points)))
+graph.write(plot_figure(s, f, o, np.array(path_points), path_color=path_color))
+
+st.markdown("""
+### Algorithm of robot
+
+0. Mark start point as the **[current step]** to the finish.
+1. Check if segment from **[current step]** to the finish has any obstacles. 
+  - 1.1. If it doesn't have obstacles, move **[current step]** to finish point and **go to [8]**
+  - 1.2. If there are obstacles, go to **[3]**.
+3. Move to the **[intersection]** between path segment and obstacle.
+4. Measure distance to the finish for every of two dots that form a segment that intersects the path. 
+5. Select the point that is closer to the finish point as an **[intermediate goal]**. 
+6. Check if there is no obstacles between **[current step]** and **[intermediate goal]**. 
+  - 6.1. If there is no intersection with obstacles, move to the  **[intermediate goal]** and make it **[current step]**
+  - 6.2. If there is going to be an intersection, mark **[intersection]** as **[current step]**
+
+7. Move to the **[intermediate goal]** and mark it as **[current step]**.
+8. Go To 1.
+9. Finish
+""")
