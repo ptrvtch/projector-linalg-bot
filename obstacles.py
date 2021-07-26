@@ -8,7 +8,7 @@ from utils import (
     get_sides_pairs,
     get_closest_intersection,
     plot_figure,
-    equal
+    equal,
 )
 
 st.set_page_config(layout="wide")
@@ -33,13 +33,6 @@ o = field["obstacles"]
 
 sides = get_sides_pairs(o)
 
-intersection, line = get_closest_intersection(s, f, sides)
-
-# end page setup and preparations
-
-
-# start algorithm
-
 
 path_points = []
 
@@ -54,8 +47,8 @@ iteration = 0
 while not np.array_equal(current_point, f):
     iteration = iteration + 1
     st.markdown(iteration)
-    if iteration == 30:
-        st.warning("30+ iterations, aborting")
+    if iteration == 10:
+        st.warning(f"{iteration} iterations, aborting")
         break
 
     st.markdown(f"Looking for nearest intersection of point {current_point} and {f}")
@@ -79,20 +72,10 @@ while not np.array_equal(current_point, f):
             st.info("current_point and closest_obstacle are equal!")
             continue
         current_point = closest_obstacle_point
-        st.markdown(
-            f"\nMoving to the obstacle edge nearest to finish: {current_point}"
-        )
+        st.markdown(f"\nMoving to the obstacle edge nearest to finish: {current_point}")
         path_points.append(current_point)
 
 
 st.dataframe(path_points)
 
 st.write(plot_figure(s, f, o, np.array(path_points)))
-
-# closest_intersection, side =
-# get_closest_intersection(
-#     current_point,
-#     f,
-#     sides,
-# )
-# print(closest_intersection, side)
