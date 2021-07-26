@@ -100,7 +100,7 @@ def plot_figure(s, f, o, path_points=None):
         path = go.Scatter(
             x=path_points.T[0], y=path_points.T[1], name="Path", marker_color="black"
         )
-        figures.append(path)
+        figures = [path] + figures
 
     coords1 = [np.array(obj).T for obj in o]
     obstacles = [
