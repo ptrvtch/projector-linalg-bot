@@ -13,8 +13,13 @@ from utils import (
 
 st.set_page_config(layout="wide")
 
-# start page setup
+st.title("Path Finding Algorithm")
+st.info("""
+Select the file example on the left, or select "Manual Input" and paste JSON to the window.
+""")
 
+# start page setup
+graph = st.empty()
 
 options = [
     "robot-test-1.json",
@@ -22,14 +27,29 @@ options = [
     "robot-test-25.json",
     "manual_input",
 ]
-file_name = st.selectbox("Select field", options=options)
 
+example = """{
+	"start": [-8, 8],
+	"finish": [-5, 6],
+	"obstacles": [
+	[[-10,6], [-4,10], [-6,7]],
+	[[-10,0], [-7,6],[0,0]],
+	[[-5,8], [0,8], [0,3]]
+	]
+}
+"""
 
-col1, col2 = st.beta_columns(2)
+file_name = st.sidebar.selectbox("Select field", options=options)
+
 
 if file_name != "manual_input":
     f = open(file_name)
     field = json.load(f)
+else:
+    input_area = st.sidebar.text_area("Manual Input", example, height=300)
+    field = json.loads(input_area)
+
+col1, col2 = st.beta_columns(2)
 
 s = np.array(field["start"])
 f = np.array(field["finish"])
@@ -39,7 +59,7 @@ sides = get_sides_pairs(o)
 
 path_points = []
 
-col1.write(plot_figure(s, f, o))
+# col1.write(plot_figure(s, f, o))
 
 current_point = s
 log = st.info(f"starting from point {current_point}")
@@ -83,4 +103,4 @@ while not np.array_equal(current_point, f):
 
 st.dataframe(path_points)
 
-col2.write(plot_figure(s, f, o, np.array(path_points)))
+graph.write(plot_figure(s, f, o, np.array(path_points)))
