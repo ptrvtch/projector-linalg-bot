@@ -9,25 +9,25 @@ def ccw(A, B, C):
     return (C[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (C[0] - A[0])
 
 
-def is_intersection(A,B,C,D):
-	## let's find two line coming through the two points of each segment
-	## v = a * v1 + (1 - a) * v2
-	## u = b * u1 + (1 - b) * u2
-	## lines intersect at u = v, =>  a * v1 + (1 - a) * v2 = b * u1 + (1 - b) * u2
-	## or  (v1 - v2) * a + (u2 - u1) * b = u2 - v2
-	## 
-	## if lines intersect within the given segments, a and b must be strictly between 0 and 1 
+def is_intersection(A, B, C, D):
+    ## let's find two line coming through the two points of each segment
+    ## v = a * v1 + (1 - a) * v2
+    ## u = b * u1 + (1 - b) * u2
+    ## lines intersect at u = v, =>  a * v1 + (1 - a) * v2 = b * u1 + (1 - b) * u2
+    ## or  (v1 - v2) * a + (u2 - u1) * b = u2 - v2
+    ##
+    ## if lines intersect within the given segments, a and b must be strictly between 0 and 1
 
-	v1, v2 = A, B
-	u1, u2 = C, D
+    v1, v2 = A, B
+    u1, u2 = C, D
 
-	M = np.array([v1 - v2, u2 - u1]).T
-	if np.linalg.matrix_rank(M) < 2:
-		return False
+    M = np.array([v1 - v2, u2 - u1]).T
+    if np.linalg.matrix_rank(M) < 2:
+        return False
 
-	a, b = np.linalg.inv(M).dot(u2 - v2)
+    a, b = np.linalg.inv(M).dot(u2 - v2)
 
-	return (0 < a < 1) and (0 < b < 1)
+    return (0 < a < 1) and (0 < b < 1)
 
 
 def get_sides_pairs(obstacles):
@@ -97,7 +97,9 @@ def plot_figure(s, f, o, path_points=None):
     # line = go.Scatter(x=x, y=y, name="Line")
     figures = [start, finish]
     if path_points is not None:
-        path = go.Scatter(x=path_points.T[0], y=path_points.T[1], name="Path")
+        path = go.Scatter(
+            x=path_points.T[0], y=path_points.T[1], name="Path", marker_color="black"
+        )
         figures.append(path)
 
     coords1 = [np.array(obj).T for obj in o]
@@ -105,15 +107,7 @@ def plot_figure(s, f, o, path_points=None):
         go.Scatter(x=c[0], y=c[1], fill="toself", showlegend=False) for c in coords1
     ]
 
-    fig = go.Figure(
-        obstacles + figures,
-        layout=dict(
-            width=800,
-            height=800,
-            # xaxis=dict(range=[-15, 15]),
-            # yaxis=dict(range=[-10, 10]),
-        ),
-    )
+    fig = go.Figure(obstacles + figures)
     return fig
 
 
