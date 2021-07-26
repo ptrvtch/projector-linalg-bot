@@ -47,32 +47,40 @@ path_points = []
 st.write(plot_figure(s, f, o))
 
 current_point = s
-log = st.markdown(f"starting from point {current_point}")
+log = st.info(f"starting from point {current_point}")
 
 path_points.append(current_point)
+iteration = 0
 while not np.array_equal(current_point, f):
+    iteration = iteration + 1
+    st.markdown(iteration)
+    if iteration == 30:
+        st.warning("30+ iterations, aborting")
+        break
 
+    st.markdown(f"Looking for nearest intersection of point {current_point} and {f}")
     nearest_intersection, line_points = get_closest_intersection(
         current_point, f, sides
     )
     if nearest_intersection is None:
         current_point = f
-        st.markdown(
+        st.info(
             f"\nNo obstacles between current and finish point, seting finish point as {current_point}"
         )
         path_points.append(current_point)
         break
     else:
         current_point = nearest_intersection
-        st.markdown(f"\nMoving to nearest intersection - {current_point}")
+        st.markdown(f"\nMoving to nearest intersection: {current_point}")
         path_points.append(current_point)
 
         closest_obstacle_point = get_closest_point(line_points, f, s)
         if equal(current_point, closest_obstacle_point):
+            st.info("current_point and closest_obstacle are equal!")
             continue
         current_point = closest_obstacle_point
         st.markdown(
-            f"\nMoving to the obstacle edge nearest to finish - {current_point}"
+            f"\nMoving to the obstacle edge nearest to finish: {current_point}"
         )
         path_points.append(current_point)
 

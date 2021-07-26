@@ -106,7 +106,7 @@ def get_closest_point(lines, finish, start):
     min_len = np.inf
     min_pt = None
     for i, line in enumerate(lines):
-        if np.all(np.isclose(line, start)):
+        if equal(line, start):
             st.info("close!")
             continue
         l = np.linalg.norm(finish - line)
