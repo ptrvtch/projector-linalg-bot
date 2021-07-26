@@ -8,6 +8,7 @@ from utils import (
     get_sides_pairs,
     get_closest_intersection,
     plot_figure,
+    equal
 )
 
 st.set_page_config(layout="wide")
@@ -67,6 +68,8 @@ while not np.array_equal(current_point, f):
         path_points.append(current_point)
 
         closest_obstacle_point = get_closest_point(line_points, f, s)
+        if equal(current_point, closest_obstacle_point):
+            continue
         current_point = closest_obstacle_point
         st.markdown(
             f"\nMoving to the obstacle edge nearest to finish - {current_point}"
