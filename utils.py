@@ -9,9 +9,25 @@ def ccw(A, B, C):
     return (C[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (C[0] - A[0])
 
 
-# Return true if line segments AB and CD intersect
-def is_intersection(A, B, C, D):
-    return ccw(A, C, D) != ccw(B, C, D) and ccw(A, B, C) != ccw(A, B, D)
+def is_intersection(A,B,C,D):
+	## let's find two line coming through the two points of each segment
+	## v = a * v1 + (1 - a) * v2
+	## u = b * u1 + (1 - b) * u2
+	## lines intersect at u = v, =>  a * v1 + (1 - a) * v2 = b * u1 + (1 - b) * u2
+	## or  (v1 - v2) * a + (u2 - u1) * b = u2 - v2
+	## 
+	## if lines intersect within the given segments, a and b must be strictly between 0 and 1 
+
+	v1, v2 = A, B
+	u1, u2 = C, D
+
+	M = np.array([v1 - v2, u2 - u1]).T
+	if np.linalg.matrix_rank(M) < 2:
+		return False
+
+	a, b = np.linalg.inv(M).dot(u2 - v2)
+
+	return (0 < a < 1) and (0 < b < 1)
 
 
 def get_sides_pairs(obstacles):
