@@ -71,6 +71,8 @@ def get_closest_intersection(point, finish, sides):
         if intrs:
             intersection = get_intersect(A, B, C, D)
             intersection_length = np.linalg.norm(intersection - point)
+            if equal(A, C) or equal(A, D):
+                continue
             if intersection_length < min_length:
                 min_length = intersection_length
                 lines = (C, D)
