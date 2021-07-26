@@ -25,6 +25,8 @@ Select the file example on the left, or select "Manual Input" and paste JSON to 
 # start page setup
 path_color = st.color_picker("Path Trace color", value="#FF0000")
 graph = st.empty()
+total_distance = st.empty()
+path_coordinates = st.empty()
 
 options = [
     "robot-test-1.json",
@@ -120,17 +122,25 @@ if not finished_successfully:
         f"Algorithm not finished successfully! stopped after {iteration} iterations"
     )
 st.sidebar.text("Path point coordinates below:")
-st.sidebar.dataframe(path_points)
+path_coordinates.dataframe(path_points)
 st.sidebar.markdown(
     json.dumps(pd.Series(path_points).to_json(orient="values"), indent=2)
 )
+
+total_len = 0
+for i in range(1, len(path_points)):
+    path_segment = np.array(path_points[i - 1] - path_points[i])
+    length = np.linalg.norm(path_segment)
+    total_len += length
+total_distance.text(f"Total Distance is {total_len}")
 
 if check_polyline(path_points, np.array(o)):
     st.info("No intersections found using function 'check_polilyne'")
 
 graph.write(plot_figure(s, f, o, np.array(path_points), path_color=path_color))
 
-st.markdown("""
+st.markdown(
+    """
 ### Algorithm of robot
 
 0. Mark start point as the **[current step]** to the finish.
@@ -147,4 +157,5 @@ st.markdown("""
 7. Move to the **[intermediate goal]** and mark it as **[current step]**.
 8. Go To 1.
 9. Finish
-""")
+"""
+)
