@@ -145,7 +145,7 @@ st.markdown(
 
 0. Mark start point as the **[current step]** to the finish.
 1. Check if segment from **[current step]** to the finish has any obstacles. 
-  - 1.1. If it doesn't have obstacles, move **[current step]** to finish point and **go to [8]**
+  - 1.1. If it doesn't have obstacles, move **[current step]** to finish point and **go to [9]**
   - 1.2. If there are obstacles, go to **[3]**.
 3. Move to the **[intersection]** between path segment and obstacle.
 4. Measure distance to the finish for every of two dots that form a segment that intersects the path. 
